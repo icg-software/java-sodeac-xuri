@@ -26,12 +26,11 @@ import java.util.concurrent.locks.Lock;
  */
 public class QuerySegment implements Serializable, IExtensible
 {
-
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -9003894798935854417L;
-	
+	private static final long serialVersionUID = 4999925096175079827L;
+
 	public QuerySegment(String expression,String type, String name, String format, String value)
 	{
 		super();

@@ -16,6 +16,11 @@ package org.sodeac.xuri;
 
 public class QueryComponent extends AbstractComponent<QuerySegment>
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 393235970805892989L;
+
 	public QueryComponent()
 	{
 		super(ComponentType.QUERY);

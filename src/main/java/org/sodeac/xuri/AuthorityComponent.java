@@ -16,6 +16,12 @@ package org.sodeac.xuri;
 
 public class AuthorityComponent extends AbstractComponent<AuthoritySubComponent>
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3937914592142761246L;
+
+
 	public AuthorityComponent()
 	{
 		super(ComponentType.AUTHORITY);

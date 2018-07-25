@@ -15,6 +15,11 @@ package org.sodeac.xuri;
  */
 public class SchemeComponent extends AbstractComponent<NoSubComponent>
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5126925115989645523L;
+	
 	private String value = null;
 	
 	public SchemeComponent(String value)

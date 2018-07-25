@@ -10,14 +10,20 @@
  *******************************************************************************/
 package org.sodeac.xuri.ldapfilter;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
 import org.sodeac.xuri.FormatException;
 import org.sodeac.xuri.IDecodingExtensionHandler;
 
-public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFilterItem>
+public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFilterItem>, Serializable
 {
-	private static volatile LDAPFilterDecodingHandler INSTANCE = null;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9187580171255086052L;
+	
+	private transient static volatile LDAPFilterDecodingHandler INSTANCE = null;
 	
 	public static LDAPFilterDecodingHandler getInstance()
 	{

@@ -11,8 +11,15 @@
 
 package org.sodeac.xuri.ldapfilter;
 
-public class Attribute implements IFilterItem
+import java.io.Serializable;
+
+public class Attribute implements IFilterItem, Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5791677902733009628L;
+
 	public Attribute()
 	{
 		super();

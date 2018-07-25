@@ -10,14 +10,20 @@
  *******************************************************************************/
 package org.sodeac.xuri;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public abstract class AbstractComponent<T>  implements IComponent<T>
+public abstract class AbstractComponent<T>  implements IComponent<T>, Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -613198655700716268L;
+	
 	private ComponentType componentType = null;
 	private String expression = null;
 	

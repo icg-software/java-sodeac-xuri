@@ -16,6 +16,11 @@ package org.sodeac.xuri;
 
 public class FragmentComponent extends AbstractComponent<NoSubComponent>
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1184594786879375170L;
+	
 	private String value = null;
 	
 	public FragmentComponent(String value)

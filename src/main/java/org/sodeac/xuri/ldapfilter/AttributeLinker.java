@@ -11,14 +11,20 @@
 
 package org.sodeac.xuri.ldapfilter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AttributeLinker implements IFilterItem 
+public class AttributeLinker implements IFilterItem, Serializable 
 {	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3252972156160851293L;
+
 	public AttributeLinker()
 	{
 		super();

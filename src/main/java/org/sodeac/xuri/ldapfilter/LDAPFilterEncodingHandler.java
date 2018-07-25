@@ -11,13 +11,20 @@
 package org.sodeac.xuri.ldapfilter;
 
 
+import java.io.Serializable;
+
 import org.sodeac.xuri.ComponentType;
 import org.sodeac.xuri.ExtensionHandleObject;
 import org.sodeac.xuri.FormatException;
 import org.sodeac.xuri.IEncodingExtensionHandler;
 
-public class LDAPFilterEncodingHandler implements IEncodingExtensionHandler<IFilterItem>
+public class LDAPFilterEncodingHandler implements IEncodingExtensionHandler<IFilterItem>, Serializable
 {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3779708657170015377L;
 	
 	public static final char OPENER = IFilterItem.OPENER;
 	public static final char CLOSER = IFilterItem.CLOSER;
@@ -25,7 +32,7 @@ public class LDAPFilterEncodingHandler implements IEncodingExtensionHandler<IFil
 	public static final char[] OPENER_CHARACTERS = new char[] {OPENER};
 	public static final char[] CLOSER_CHARACTERS = new char[] {CLOSER};
 	
-	private static volatile LDAPFilterEncodingHandler INSTANCE = null;
+	private transient static volatile LDAPFilterEncodingHandler INSTANCE = null;
 	
 	public static LDAPFilterEncodingHandler getInstance()
 	{

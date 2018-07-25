@@ -12,6 +12,11 @@ package org.sodeac.xuri;
 
 public class PathComponent extends AbstractComponent<PathSegment>
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2578881338528861330L;
+	
 	/*
 	 * https://tools.ietf.org/html/rfc3986#section-3.3
 	 */

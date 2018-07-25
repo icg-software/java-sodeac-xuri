@@ -10,8 +10,15 @@
  *******************************************************************************/
 package org.sodeac.xuri;
 
-public class ExtensionHandleObject
+import java.io.Serializable;
+
+public class ExtensionHandleObject implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4292017896595754513L;
+	
 	public URI uri;
 	public ComponentType component;
 	public String fullPath;

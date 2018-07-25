@@ -10,10 +10,17 @@
  *******************************************************************************/
 package org.sodeac.xuri.ldapfilter;
 
+import java.io.Serializable;
+
 import org.sodeac.xuri.IExtension;
 
-public class LDAPFilterExtension implements IExtension
+public class LDAPFilterExtension implements IExtension, Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9054192628876497162L;
+	
 	public static final String TYPE = "org.sodeac.xuri.ldapfilter";
 
 	@Override

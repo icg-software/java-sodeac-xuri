@@ -10,14 +10,20 @@
  *******************************************************************************/
 package org.sodeac.xuri;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AuthoritySubComponent implements IExtensible
+public class AuthoritySubComponent implements IExtensible, Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8307822793728177004L;
+	
 	private List<IExtension> extensions = null;
 	private volatile List<IExtension> extensionsImmutable = null;
 	private Lock extensionsLock = null;

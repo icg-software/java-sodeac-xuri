@@ -26,11 +26,10 @@ import java.util.concurrent.locks.Lock;
  */
 public class PathSegment implements Serializable, IExtensible
 {
-
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 6873076806815031592L;
+	private static final long serialVersionUID = -603368963433292990L;
 
 	public PathSegment(String expression, String value)
 	{

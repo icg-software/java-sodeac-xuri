@@ -10,7 +10,14 @@
  *******************************************************************************/
 package org.sodeac.xuri;
 
-public class NoSubComponent
+import java.io.Serializable;
+
+public class NoSubComponent implements Serializable
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7279745335408819219L;
 
 }

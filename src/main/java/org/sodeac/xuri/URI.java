@@ -21,10 +21,11 @@ import java.io.Serializable;
  */
 public class URI implements Serializable 
 {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -8676655992924869L;
+	private static final long serialVersionUID = 1421043812832070455L;
 
 	protected String fullPath = null;
 	
