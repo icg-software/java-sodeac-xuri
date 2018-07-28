@@ -11,6 +11,8 @@
 
 package org.sodeac.xuri.ldapfilter;
 
+import java.util.Map;
+
 public interface IFilterItem 
 {
 	public static final char OPENER = '(';
@@ -27,4 +29,6 @@ public interface IFilterItem
 	public boolean isInvert() ;
 	public IFilterItem setInvert(boolean invert) ;
 	public AttributeLinker getParent();
+	
+	public boolean matches(Map<String,IMatchable> properties);
 }

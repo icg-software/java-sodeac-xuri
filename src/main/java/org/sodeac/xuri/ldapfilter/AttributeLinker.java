@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -152,5 +153,29 @@ public class AttributeLinker implements IFilterItem, Serializable
 		
 		stringBuilder.append(")");
 		return stringBuilder.toString();
+	}
+	
+	public boolean matches(Map<String,IMatchable> properties)
+	{
+		if(operator == LogicalOperator.OR)
+		{
+			for(IFilterItem filterItem : getLinkedItemList())
+			{
+				if(filterItem.matches(properties))
+				{
+					return ! invert;
+				}
+			}
+			return invert;
+		}
+		
+		for(IFilterItem filterItem : getLinkedItemList())
+		{
+			if(!filterItem.matches(properties))
+			{
+				return invert;
+			}
+		}
+		return ! invert;
 	}
 }

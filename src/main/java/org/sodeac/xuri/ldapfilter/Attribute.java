@@ -12,6 +12,7 @@
 package org.sodeac.xuri.ldapfilter;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class Attribute implements IFilterItem, Serializable
 {
@@ -129,5 +130,15 @@ public class Attribute implements IFilterItem, Serializable
 		stringBuilder.append(")");
 		
 		return stringBuilder.toString();
+	}
+	
+	public boolean matches(Map<String,IMatchable> properties)
+	{
+		IMatchable matchable = properties.get(this.name);
+		if((matchable != null) && matchable.matches(operator, this.name, this.value ))
+		{
+			return ! invert;
+		}
+		return invert;
 	}
 }
