@@ -71,6 +71,11 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 		this.extensionsLock.lock();
 		try
 		{
+			if(this.extensions == null)
+			{
+				this.extensions = new ArrayList<IExtension>();
+			}
+			
 			this.extensions.add(extension);
 			this.extensionsImmutable = null;
 		}
@@ -113,7 +118,7 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 				{
 					return extensionList;
 				}
-				this.extensionsImmutable = Collections.unmodifiableList(new ArrayList<IExtension>(this.extensions));
+				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension>() : new ArrayList<IExtension>(this.extensions));
 				extensionList = this.extensionsImmutable;
 			}
 			finally 

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -39,6 +40,8 @@ public class QuerySegment implements Serializable, IExtensible
 		this.name = name;
 		this.format = format;
 		this.value = value;
+		
+		this.extensionsLock = new ReentrantLock();
 	}
 	
 	private List<IExtension> extensions = null;
@@ -61,6 +64,10 @@ public class QuerySegment implements Serializable, IExtensible
 		this.extensionsLock.lock();
 		try
 		{
+			if(this.extensions == null)
+			{
+				this.extensions = new ArrayList<IExtension>();
+			}
 			this.extensions.add(extension);
 			this.extensionsImmutable = null;
 		}
@@ -103,7 +110,7 @@ public class QuerySegment implements Serializable, IExtensible
 				{
 					return extensionList;
 				}
-				this.extensionsImmutable = Collections.unmodifiableList(new ArrayList<IExtension>(this.extensions));
+				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension>() : new ArrayList<IExtension>(this.extensions));
 				extensionList = this.extensionsImmutable;
 			}
 			finally 

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -37,6 +38,8 @@ public class PathSegment implements Serializable, IExtensible
 		this.expression = expression;
 		this.value = value;
 		this.axis = Axis.CHILD;
+		
+		this.extensionsLock = new ReentrantLock();
 	}
 	
 	public PathSegment(String expression, String value, Axis axis)
@@ -70,6 +73,10 @@ public class PathSegment implements Serializable, IExtensible
 		this.extensionsLock.lock();
 		try
 		{
+			if(this.extensions == null)
+			{
+				this.extensions = new ArrayList<IExtension>();
+			}
 			this.extensions.add(extension);
 			this.extensionsImmutable = null;
 		}
@@ -112,7 +119,7 @@ public class PathSegment implements Serializable, IExtensible
 				{
 					return extensionList;
 				}
-				this.extensionsImmutable = Collections.unmodifiableList(new ArrayList<IExtension>(this.extensions));
+				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension>() : new ArrayList<IExtension>(this.extensions));
 				extensionList = this.extensionsImmutable;
 			}
 			finally 
