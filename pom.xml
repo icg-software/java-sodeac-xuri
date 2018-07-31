@@ -66,7 +66,7 @@
         <configuration>
           <instructions>
           	<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Bundle-Version>${project.version}</Bundle-Version>
+            <Bundle-Version>${bundle.version}</Bundle-Version>
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
             <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
             <Export-Package>org.sodeac.xuri*;version="${bundle.version}"</Export-Package>
