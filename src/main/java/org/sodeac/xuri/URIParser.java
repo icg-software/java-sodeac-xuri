@@ -15,8 +15,10 @@ import java.io.Serializable;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import org.sodeac.xuri.ldapfilter.LDAPFilterEncodingHandler;
 
@@ -48,19 +50,95 @@ public final class URIParser implements Serializable
 	
 	private static final int SIZE_CASH_HELPER_OBJECT = 13;
 	
+	@SuppressWarnings("rawtypes")
 	protected static List<IEncodingExtensionHandler<?>> getEncodingExtensionHandler(ComponentType componentType, URI uri)
 	{
-		// TODO Registry (SPI???)
 		
 		List<IEncodingExtensionHandler<?>> list = CACHE_ENCODING_EXTENSION;
 		if(CACHE_ENCODING_EXTENSION == null)
 		{
-			list = new ArrayList<IEncodingExtensionHandler<?>>();
-			list.add(LDAPFilterEncodingHandler.getInstance());
-			list = Collections.unmodifiableList(list);
-			CACHE_ENCODING_EXTENSION = list;
+			synchronized(URIParser.class)
+			{
+				list = CACHE_ENCODING_EXTENSION;
+				if(CACHE_ENCODING_EXTENSION == null)
+				{
+					list = new ArrayList<IEncodingExtensionHandler<?>>();
+					list.add(LDAPFilterEncodingHandler.getInstance());
+					
+					ServiceLoader<IEncodingExtensionHandler> loader = ServiceLoader.load(IEncodingExtensionHandler.class);
+					Iterator<IEncodingExtensionHandler> iterator = loader.iterator();
+					while(iterator.hasNext())
+					{
+						addEncodingExtensionHandler(iterator.next());
+					}
+					list = Collections.unmodifiableList(list);
+					CACHE_ENCODING_EXTENSION = list;
+				}
+			}
 		}
 		return list;
+	}
+	
+	public static void addEncodingExtensionHandler(IEncodingExtensionHandler<?> encodingExtensionHandler)
+	{
+		if((encodingExtensionHandler.getType() == null) || encodingExtensionHandler.getType().isEmpty())
+		{
+			throw new NullPointerException("type of encoding extension is undefined");
+		}
+		
+		synchronized(URIParser.class)
+		{
+			List<IEncodingExtensionHandler<?>> newList = new ArrayList<IEncodingExtensionHandler<?>>();
+			for(IEncodingExtensionHandler<?> handler : getEncodingExtensionHandler(null, null))
+			{
+				if(handler.getType().equals(encodingExtensionHandler.getType()))
+				{
+					continue;
+				}
+				newList.add(handler);
+			}
+			newList.add(encodingExtensionHandler);
+			CACHE_ENCODING_EXTENSION = Collections.unmodifiableList(newList);
+		}
+		
+	}
+	
+	public static void removeEncodingExtensionHandler(IEncodingExtensionHandler<?> encodingExtensionHandler)
+	{
+		if((encodingExtensionHandler.getType() == null) || encodingExtensionHandler.getType().isEmpty())
+		{
+			throw new NullPointerException("type of encoding extension is undefined");
+		}
+		
+		synchronized(URIParser.class)
+		{
+			boolean removed = false;
+			
+			for(IEncodingExtensionHandler<?> handler : getEncodingExtensionHandler(null, null))
+			{
+				if(handler.getType().equals(encodingExtensionHandler.getType()))
+				{
+					removed = true;
+					break;
+				}
+			}
+			if(! removed)
+			{
+				return;
+			}
+			
+			List<IEncodingExtensionHandler<?>> newList = new ArrayList<IEncodingExtensionHandler<?>>();
+			for(IEncodingExtensionHandler<?> handler : getEncodingExtensionHandler(null, null))
+			{
+				if(handler.getType().equals(encodingExtensionHandler.getType()))
+				{
+					continue;
+				}
+				newList.add(handler);
+			}
+			CACHE_ENCODING_EXTENSION = Collections.unmodifiableList(newList);
+		}
+		
 	}
 	
 	protected static volatile URIParser instance = null;
