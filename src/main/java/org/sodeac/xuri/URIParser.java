@@ -14,6 +14,8 @@ package org.sodeac.xuri;
 import java.io.Serializable;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.sodeac.xuri.ldapfilter.LDAPFilterEncodingHandler;
@@ -25,7 +27,7 @@ https://tools.ietf.org/html/rfc3986
 
 */
 
-public class URIParser implements Serializable
+public final class URIParser implements Serializable
 {
 	/**
 	 * 
@@ -44,18 +46,26 @@ public class URIParser implements Serializable
 	public static final char AND			= '&';
 	public static final char EQUAL			= '=';
 	
-	public static List<IEncodingExtensionHandler<?>> getEncodingExtensionHandler(ComponentType componentType, URI uri)
+	private static final int SIZE_CASH_HELPER_OBJECT = 13;
+	
+	protected static List<IEncodingExtensionHandler<?>> getEncodingExtensionHandler(ComponentType componentType, URI uri)
 	{
-		// TODO Cache && Registry
+		// TODO Registry (SPI???)
 		
-		List<IEncodingExtensionHandler<?>> list = new ArrayList<IEncodingExtensionHandler<?>>();
-		list.add(LDAPFilterEncodingHandler.getInstance());
-		
+		List<IEncodingExtensionHandler<?>> list = CACHE_ENCODING_EXTENSION;
+		if(CACHE_ENCODING_EXTENSION == null)
+		{
+			list = new ArrayList<IEncodingExtensionHandler<?>>();
+			list.add(LDAPFilterEncodingHandler.getInstance());
+			list = Collections.unmodifiableList(list);
+			CACHE_ENCODING_EXTENSION = list;
+		}
 		return list;
 	}
 	
-	public static volatile URIParser instance = null;
-	
+	protected static volatile URIParser instance = null;
+	protected static final LinkedList<ParserHelperContainerObject> CACHE_PARSER_HELPER_CONTAINER_OBJECT = new LinkedList<ParserHelperContainerObject>();
+	protected volatile static List<IEncodingExtensionHandler<?>> CACHE_ENCODING_EXTENSION = null;
 	protected static URIParser getInstance()
 	{
 		if(instance == null)
@@ -67,45 +77,68 @@ public class URIParser implements Serializable
 
 	protected URI parse(URI uri)
 	{
-		ParserHelperContainerObject workerObject = new ParserHelperContainerObject(); // TODO cache
-		workerObject.uri = uri;
-		workerObject.fullPath = uri.getFullPath();
-		workerObject.maxPosition = workerObject.fullPath.length() -1;
+		ParserHelperContainerObject workerObject = null;
 		
-		parseScheme(workerObject);
-		if(workerObject.containsAuthority)
+		synchronized (URIParser.CACHE_PARSER_HELPER_CONTAINER_OBJECT)
 		{
-			parseAuthority(workerObject);
-		}
-		else
-		{
-			workerObject.uri.authority = new AuthorityComponent();
+			if(URIParser.CACHE_PARSER_HELPER_CONTAINER_OBJECT.size() > 0)
+			{
+				workerObject = URIParser.CACHE_PARSER_HELPER_CONTAINER_OBJECT.removeFirst();
+			}
+			else
+			{
+				workerObject = new ParserHelperContainerObject();
+			}
 		}
 		
-		if(workerObject.containsPath)
+		try
 		{
-			parsePath(workerObject);
+			workerObject.uri = uri;
+			workerObject.fullPath = uri.getFullPath();
+			workerObject.maxPosition = workerObject.fullPath.length() -1;
+			
+			parseScheme(workerObject);
+			if(workerObject.containsAuthority)
+			{
+				parseAuthority(workerObject);
+			}
+			else
+			{
+				workerObject.uri.authority = new AuthorityComponent();
+			}
+			
+			if(workerObject.containsPath)
+			{
+				parsePath(workerObject);
+			}
+			else
+			{
+				workerObject.uri.path = new PathComponent(false);
+				workerObject.uri.path.setExpression("");
+			}
+			if(workerObject.containsQuery)
+			{
+				parseQuery(workerObject);
+			}
+			else
+			{
+				workerObject.uri.query = new QueryComponent();
+				workerObject.uri.query.setExpression("");
+			}
+			if(workerObject.containsFragment)
+			{
+				parseFragment(workerObject);
+			}
+			return uri;
 		}
-		else
+		finally 
 		{
-			workerObject.uri.path = new PathComponent(false);
-			workerObject.uri.path.setExpression("");
+			if(URIParser.CACHE_PARSER_HELPER_CONTAINER_OBJECT.size() < URIParser.SIZE_CASH_HELPER_OBJECT)
+			{
+				workerObject.clear();
+				URIParser.CACHE_PARSER_HELPER_CONTAINER_OBJECT.addLast(workerObject);
+			}
 		}
-		if(workerObject.containsQuery)
-		{
-			parseQuery(workerObject);
-		}
-		else
-		{
-			workerObject.uri.query = new QueryComponent();
-			workerObject.uri.query.setExpression("");
-		}
-		if(workerObject.containsFragment)
-		{
-			parseFragment(workerObject);
-		}
-		// TODO recycle workerObject
-		return uri;
 	}
 	
 	private void parseScheme(ParserHelperContainerObject workerObject )
@@ -116,9 +149,9 @@ public class URIParser implements Serializable
 			{
 				case COLON:
 					String scheme = decodeUrl(workerObject.mainStringBuilder.toString());
-					if((workerObject.fullPath.length() > (workerObject.currentPosition + 1)) && (workerObject.fullPath.charAt(workerObject.currentPosition + 1) == '/') )
+					if((workerObject.fullPath.length() > (workerObject.currentPosition + 1)) && (workerObject.fullPath.charAt(workerObject.currentPosition + 1) == SLASH) )
 					{
-						if((workerObject.fullPath.length() > (workerObject.currentPosition + 2)) && (workerObject.fullPath.charAt(workerObject.currentPosition + 2) == '/') )
+						if((workerObject.fullPath.length() > (workerObject.currentPosition + 2)) && (workerObject.fullPath.charAt(workerObject.currentPosition + 2) == SLASH) )
 						{
 							workerObject.currentPosition = workerObject.currentPosition + 3;
 							workerObject.containsAuthority = true;
@@ -165,7 +198,7 @@ public class URIParser implements Serializable
 		workerObject.containsFragment = false;
 		workerObject.authoritySubComponent = null;
 		workerObject.containsExtension = false;
-		workerObject.prefixdelimiter = '/';
+		workerObject.prefixdelimiter = SLASH;
 		workerObject.backup1CurrentPosition = workerObject.currentPosition;
 		workerObject.backup2CurrentPosition = workerObject.backup1CurrentPosition;
 		
@@ -394,7 +427,7 @@ public class URIParser implements Serializable
 		workerObject.uri.authority.addSubComponent(workerObject.authoritySubComponent);
 		workerObject.uri.authority.setExpression(workerObject.fullPath.substring(workerObject.backup1CurrentPosition, workerObject.currentPosition));
 		workerObject.authoritySubComponent.setPrefixDelimiter(workerObject.prefixdelimiter);
-		workerObject.authoritySubComponent.setPostfixDelimiter('/');
+		workerObject.authoritySubComponent.setPostfixDelimiter(SLASH);
 		workerObject.currentPosition++;
 		workerObject.authoritySubComponent = null;
 	}
@@ -969,215 +1002,6 @@ public class URIParser implements Serializable
 		workerObject.clearParser();
 		throw new FormatException("no closing sequence } found in json parameter " + " : " + workerObject.fullPath);
     }
-    
-	/*private static void parseFilterArea(StringBuilder sb,URIPathItem uriPathItem)
-	{
-		UnparsedFilterPart rootFilterPart = new UnparsedFilterPart();
-		rootFilterPart.raw = sb.toString();
-		rootFilterPart.parentPathItem = uriPathItem;
-		List<UnparsedFilterPart> toParse = new ArrayList<UnparsedFilterPart>();
-		toParse.add(rootFilterPart);
-		
-		clearStringBuilder(sb);
-		
-		while(toParse.size() > 0)
-		{
-			UnparsedFilterPart filterPart = toParse.remove(0);
-			
-			boolean simpleMode = true;
-			
-			if(filterPart.raw.indexOf('(') > -1){simpleMode = false;}
-			
-			boolean invert = false;
-			FilterItemLinker.Operation linkOperation = FilterItemLinker.Operation.AND;
-			
-			if(! simpleMode)
-			{
-				List<String> filterItemList = new ArrayList<String>();
-				boolean initSection = true;
-				int over = 0;
-				int posFirst = -1;
-				char c;
-				for(int i = 0; i < filterPart.raw.length(); i++)
-				{
-					c = filterPart.raw.charAt(i);
-					if(c == ' ')
-					{
-						continue;
-					}
-					if(initSection)
-					{
-						if(c == '!')
-						{
-							invert = true;
-							continue;
-						}
-						if(c == '&')
-						{
-							linkOperation = FilterItemLinker.Operation.AND;
-							continue;
-						}
-						if(c == '|')
-						{
-							linkOperation = FilterItemLinker.Operation.OR;
-							continue;
-						}
-						if(c == '^')
-						{
-							linkOperation = FilterItemLinker.Operation.XOR;
-							continue;
-						}
-						initSection = false;
-					}
-					
-					if(c == '(')
-					{
-						if(over == 0)
-						{
-							posFirst = i;
-						}
-						over++;
-					}
-					else if(c == ')')
-					{
-						over--;
-						if(over == 0)
-						{
-							String filterItemString = filterPart.raw.substring(posFirst+1, i);
-							filterItemList.add(filterItemString);
-						}
-						if(over < 0)
-						{
-							throw new FormatException("FilterItem malformed: " + filterPart.raw);
-						}
-					}
-				}
-				
-				if(filterItemList.size() == 0)
-				{
-					throw new FormatException("FilterItem malformed: " + filterPart.raw);
-				}
-				
-				if(over > 0)
-				{
-					throw new FormatException("FilterItem malformed: " + filterPart.raw);
-				}
-				
-				if(filterItemList.size() == 0)
-				{
-					continue;
-				}
-				
-				if((filterItemList.size() == 1) && (filterItemList.get(0).indexOf("(") < 0))
-				{
-					filterPart.raw = filterItemList.get(0);
-				}
-				else
-				{
-					FilterItemLinker linker = new FilterItemLinker();
-					linker.setInvert(invert);
-					linker.setOperation(linkOperation);
-					
-					if(filterPart.parentPathItem != null)
-					{
-						((URIPathItem )filterPart.parentPathItem).setFilterItem(linker);
-					}
-					else
-					{
-						filterPart.parentLinker.getLinkItemList().add(linker);
-					}
-					
-					for(String  part : filterItemList)
-					{
-						UnparsedFilterPart newUnparsed = new UnparsedFilterPart();
-						newUnparsed.parentLinker = linker;
-						newUnparsed.raw = part;
-						toParse.add(newUnparsed);
-					}
-					continue;
-				}
-			}
-			
-			String simpleFilterToParse = filterPart.raw;
-			
-			URIPathItemFilter filter = new URIPathItemFilter();
-			filter.setInvert(invert);
-			
-			// key: keyType:key (buchstaben/zahl
-
-			int operatorBegin = -1;
-			int valueBegin = -1;
-			
-			char c;
-			for(int i = 0; i < simpleFilterToParse.length(); i++)
-			{
-				c = simpleFilterToParse.charAt(i);
-				if(c == ' ')
-				{
-					continue;
-				}
-				
-				if(operatorBegin > -1)
-				{
-					if
-					(
-						((c >= 'a') && (c <= 'z')) ||
-						((c >= 'A') && (c <= 'Z')) ||
-						((c >= '0') && (c <= '9')) || 
-						((c == '\'') || (c == '"'))
-					)
-					{
-						valueBegin = i;
-						filter.setOperator(simpleFilterToParse.substring(operatorBegin, i).trim());
-						//System.out.println(".." + filter.getOperator() + "..");
-						break;
-					}
-				}
-				
-				if(operatorBegin < 0)
-				{
-					if
-					(
-						((c >= 'a') && (c <= 'z')) ||
-						((c >= 'A') && (c <= 'Z')) ||
-						((c >= '0') && (c <= '9')) ||
-						((c == '.') || (c == ':') | (c == '-') || (c == '_') )
-					)
-					{
-						continue;
-					}
-					
-					filter.setKey(simpleFilterToParse.substring(0, i).trim());
-					operatorBegin = i;
-					continue;
-					
-				}
-			}
-			
-			if(valueBegin > -1)
-			{
-				filter.setValue(decodeString(simpleFilterToParse.substring(valueBegin,simpleFilterToParse.length()).trim()));
-				//System.out.println("..." + filter.getValue() + "...");
-			}
-			else if(operatorBegin > -1)
-			{
-				filter.setOperator(simpleFilterToParse.substring(operatorBegin, simpleFilterToParse.length()).trim());
-				//System.out.println(".." + filter.getOperator() + "..");
-			}
-			
-			
-			if(filterPart.parentPathItem != null)
-			{
-				((URIPathItem )filterPart.parentPathItem).setFilterItem(filter);
-			}
-			else
-			{
-				filterPart.parentLinker.getLinkItemList().add(filter);
-			}
-			
-		}
-		
-	}*/
 	
 	private class ParserHelperContainerObject
 	{
@@ -1268,6 +1092,46 @@ public class URIParser implements Serializable
 			{
 				mainStringBuilder.delete(0, mainStringBuilder.length() );
 			}
+		}
+		
+		private void clear()
+		{
+			this.currentCharacter = '.';
+			this.fullPath = null;
+			this.containsExtension = true;
+			this.pathIsRelative = false;
+			this.containsAuthority = true;
+			this.containsPath = true;
+			this.containsQuery = false;
+			this.containsFragment = false;
+			this.prefixdelimiter = ':';
+			this.currentPosition = 0;
+			this.backup1CurrentPosition = 0;
+			this.backup2CurrentPosition = 0;
+			this.maxPosition = -1;
+			this.extensionBegin = -1;
+			this.extensionEnd = -1;
+			this.value = null;
+			this.expression = null;
+			this.mainStringBuilder.setLength(0);
+			this.uri = null;
+			this.extensionHandleObject = null;
+			this.inIPv6Mode = false;
+			this.authoritySubComponent = null;
+			this.pathSegment = null;
+			this.querySegment = null;
+			this.qtype = null;
+			this.qname = null;
+			this.qformat = null;
+			this.qvalue = null;
+			this.qtypeParsed = false;
+			this.qnameParsed = false;
+			this.qformatParsed = false;
+			this.quoteChar = SINGLE_QUOTE;
+			this.escapeChar = BACKSLASH;
+			this.inEscape = false;
+			this.inQuote = false;
+			this.nestedLevel = 0;
 		}
 	}
 }
