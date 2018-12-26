@@ -16,7 +16,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- *  
+ * Enum of logical operator to link ldap filter items
+ * 
  * @author Sebastian Palarus
  * @since 1.0
  * @version 1.0

@@ -13,6 +13,14 @@ package org.sodeac.xuri.ldapfilter;
 
 import java.util.Map;
 
+/**
+ * Filter items represent ldap filter or ldap sub filter
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ *
+ */
 public interface IFilterItem 
 {
 	public static final char OPENER = '(';
@@ -26,9 +34,33 @@ public interface IFilterItem
 	public static final char APPROX_STARTSEQ = '~';
 	public static final char EQUAL = '=';
 	
+	/**
+	 * getter for invert state
+	 * 
+	 * @return true if converted, otherwise false
+	 */
 	public boolean isInvert() ;
+	
+	/**
+	 * setter for inverted state
+	 * @param invert invert state
+	 * 
+	 * @return filter item
+	 */
 	public IFilterItem setInvert(boolean invert) ;
+	
+	/**
+	 * getter for parent filter item
+	 * 
+	 * @return parent filter item
+	 */
 	public AttributeLinker getParent();
 	
+	/**
+	 * check {@code properties} match filter item
+	 * 
+	 * @param properties
+	 * @return true if {@code properties} match filter item, otherwise false
+	 */
 	public boolean matches(Map<String,IMatchable> properties);
 }

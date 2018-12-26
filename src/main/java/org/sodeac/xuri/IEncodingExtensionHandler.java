@@ -10,11 +10,29 @@
  *******************************************************************************/
 package org.sodeac.xuri;
 
+/**
+ * An encoding extension handler encodes an extension data object of type {@link T} to formated string   
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ * 
+ * @param <T>
+ */
 public interface IEncodingExtensionHandler<T>
 {
+	/**
+	 * extension type of encoding extension handler
+	 * 
+	 * @return
+	 */
 	public String getType();
-	public int parseRawExtensionString(ExtensionHandleObject extensionHandleObject);
-	public int openerCharactersMatched(ExtensionHandleObject extensionHandleObject);
-	public ComponentType[] getApplicableComponents();
+	
+	/**
+	 * encodes extension object of type {@link T} to string encoded extension
+	 * 
+	 * @param extensionDataObject
+	 * @return
+	 */
 	public String encodeToString(T extensionDataObject);
 }

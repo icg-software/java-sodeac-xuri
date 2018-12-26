@@ -17,6 +17,16 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+
+/**
+ * Base class for URI components. Components contains subcomponents and a representative expression string.
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ * 
+ * @param <T>
+ */
 public abstract class AbstractComponent<T>  implements IComponent<T>, Serializable
 {
 	/**
@@ -27,6 +37,11 @@ public abstract class AbstractComponent<T>  implements IComponent<T>, Serializab
 	private ComponentType componentType = null;
 	private String expression = null;
 	
+	/**
+	 * constructer must invoke by subclass.
+	 * 
+	 * @param componentType type of component 
+	 */
 	protected AbstractComponent(ComponentType componentType)
 	{
 		super();
@@ -39,6 +54,12 @@ public abstract class AbstractComponent<T>  implements IComponent<T>, Serializab
 	private volatile List<T> subComponentsImmutable = null;
 	private Lock subComponentsLock = null;
 	
+	/**
+	 * Adds a subcomponent. For example: A path component (Component) should add pathsegment subcomponents
+	 * 
+	 * @param subComponent
+	 * @return
+	 */
 	protected AbstractComponent<T> addSubComponent(T subComponent)
 	{
 		this.subComponentsLock.lock();
@@ -54,6 +75,11 @@ public abstract class AbstractComponent<T>  implements IComponent<T>, Serializab
 		return this;
 	}
 	
+	/**
+	 * getter for subcomponents.
+	 * 
+	 * @return immutable list of all subcomponents.
+	 */
 	public List<T> getSubComponentList()
 	{
 		List<T> subComponentList = this.subComponentsImmutable;
@@ -78,16 +104,31 @@ public abstract class AbstractComponent<T>  implements IComponent<T>, Serializab
 		return subComponentList;
 	}
 	
+	/**
+	 * getter for component type
+	 * 
+	 * @return component type
+	 */
 	public ComponentType getComponentType()
 	{
 		return this.componentType;
 	}
 
+	/**
+	 * getter for expression string
+	 * 
+	 * @return string represents this component part of URI
+	 */
 	public String getExpression()
 	{
 		return expression;
 	}
 
+	/**
+	 * setter for expression string
+	 * 
+	 * @param expression string represents this component part of URI
+	 */
 	protected void setExpression(String expression)
 	{
 		this.expression = expression;

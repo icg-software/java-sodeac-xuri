@@ -14,6 +14,14 @@ package org.sodeac.xuri;
  * https://tools.ietf.org/html/rfc3986#section-3.2
  */
 
+/**
+ * Authority component of URI. Authority components contains multiple subcomponents of type {@link AuthoritySubComponent}. 
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ *
+ */
 public class AuthorityComponent extends AbstractComponent<AuthoritySubComponent>
 {
 	/**
@@ -22,15 +30,12 @@ public class AuthorityComponent extends AbstractComponent<AuthoritySubComponent>
 	private static final long serialVersionUID = 3937914592142761246L;
 
 
+	/**
+	 * constructor for authority component
+	 */
 	public AuthorityComponent()
 	{
 		super(ComponentType.AUTHORITY);
 	}
 	
-	
-	public String getMajorComponent()
-	{
-		return super.getExpression();
-	}
-
 }

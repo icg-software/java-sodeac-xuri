@@ -20,8 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import org.sodeac.xuri.ldapfilter.LDAPFilterEncodingHandler;
-
+import org.sodeac.xuri.ldapfilter.LDAPFilterDecodingHandler;
 
 /*
  * 
@@ -51,10 +50,10 @@ public final class URIParser implements Serializable
 	private static final int SIZE_CASH_HELPER_OBJECT = 13;
 	
 	@SuppressWarnings("rawtypes")
-	protected static List<IEncodingExtensionHandler<?>> getEncodingExtensionHandler(ComponentType componentType, URI uri)
+	protected static List<IDecodingExtensionHandler<?>> getDecodingExtensionHandler(ComponentType componentType, URI uri)
 	{
 		
-		List<IEncodingExtensionHandler<?>> list = CACHE_ENCODING_EXTENSION;
+		List<IDecodingExtensionHandler<?>> list = CACHE_ENCODING_EXTENSION;
 		if(CACHE_ENCODING_EXTENSION == null)
 		{
 			synchronized(URIParser.class)
@@ -62,14 +61,14 @@ public final class URIParser implements Serializable
 				list = CACHE_ENCODING_EXTENSION;
 				if(CACHE_ENCODING_EXTENSION == null)
 				{
-					list = new ArrayList<IEncodingExtensionHandler<?>>();
-					list.add(LDAPFilterEncodingHandler.getInstance());
+					list = new ArrayList<IDecodingExtensionHandler<?>>();
+					list.add(LDAPFilterDecodingHandler.getInstance());
 					
-					ServiceLoader<IEncodingExtensionHandler> loader = ServiceLoader.load(IEncodingExtensionHandler.class);
-					Iterator<IEncodingExtensionHandler> iterator = loader.iterator();
+					ServiceLoader<IDecodingExtensionHandler> loader = ServiceLoader.load(IDecodingExtensionHandler.class);
+					Iterator<IDecodingExtensionHandler> iterator = loader.iterator();
 					while(iterator.hasNext())
 					{
-						addEncodingExtensionHandler(iterator.next());
+						addDecodingExtensionHandler(iterator.next());
 					}
 					list = Collections.unmodifiableList(list);
 					CACHE_ENCODING_EXTENSION = list;
@@ -79,33 +78,33 @@ public final class URIParser implements Serializable
 		return list;
 	}
 	
-	public static void addEncodingExtensionHandler(IEncodingExtensionHandler<?> encodingExtensionHandler)
+	public static void addDecodingExtensionHandler(IDecodingExtensionHandler<?> decodingExtensionHandler)
 	{
-		if((encodingExtensionHandler.getType() == null) || encodingExtensionHandler.getType().isEmpty())
+		if((decodingExtensionHandler.getType() == null) || decodingExtensionHandler.getType().isEmpty())
 		{
 			throw new NullPointerException("type of encoding extension is undefined");
 		}
 		
 		synchronized(URIParser.class)
 		{
-			List<IEncodingExtensionHandler<?>> newList = new ArrayList<IEncodingExtensionHandler<?>>();
-			for(IEncodingExtensionHandler<?> handler : getEncodingExtensionHandler(null, null))
+			List<IDecodingExtensionHandler<?>> newList = new ArrayList<IDecodingExtensionHandler<?>>();
+			for(IDecodingExtensionHandler<?> handler : getDecodingExtensionHandler(null, null))
 			{
-				if(handler.getType().equals(encodingExtensionHandler.getType()))
+				if(handler.getType().equals(decodingExtensionHandler.getType()))
 				{
 					continue;
 				}
 				newList.add(handler);
 			}
-			newList.add(encodingExtensionHandler);
+			newList.add(decodingExtensionHandler);
 			CACHE_ENCODING_EXTENSION = Collections.unmodifiableList(newList);
 		}
 		
 	}
 	
-	public static void removeEncodingExtensionHandler(IEncodingExtensionHandler<?> encodingExtensionHandler)
+	public static void removeDecodingExtensionHandler(IDecodingExtensionHandler<?> decodingExtensionHandler)
 	{
-		if((encodingExtensionHandler.getType() == null) || encodingExtensionHandler.getType().isEmpty())
+		if((decodingExtensionHandler.getType() == null) || decodingExtensionHandler.getType().isEmpty())
 		{
 			throw new NullPointerException("type of encoding extension is undefined");
 		}
@@ -114,9 +113,9 @@ public final class URIParser implements Serializable
 		{
 			boolean removed = false;
 			
-			for(IEncodingExtensionHandler<?> handler : getEncodingExtensionHandler(null, null))
+			for(IDecodingExtensionHandler<?> handler : getDecodingExtensionHandler(null, null))
 			{
-				if(handler.getType().equals(encodingExtensionHandler.getType()))
+				if(handler.getType().equals(decodingExtensionHandler.getType()))
 				{
 					removed = true;
 					break;
@@ -127,10 +126,10 @@ public final class URIParser implements Serializable
 				return;
 			}
 			
-			List<IEncodingExtensionHandler<?>> newList = new ArrayList<IEncodingExtensionHandler<?>>();
-			for(IEncodingExtensionHandler<?> handler : getEncodingExtensionHandler(null, null))
+			List<IDecodingExtensionHandler<?>> newList = new ArrayList<IDecodingExtensionHandler<?>>();
+			for(IDecodingExtensionHandler<?> handler : getDecodingExtensionHandler(null, null))
 			{
-				if(handler.getType().equals(encodingExtensionHandler.getType()))
+				if(handler.getType().equals(decodingExtensionHandler.getType()))
 				{
 					continue;
 				}
@@ -143,7 +142,7 @@ public final class URIParser implements Serializable
 	
 	protected static volatile URIParser instance = null;
 	protected static final LinkedList<ParserHelperContainerObject> CACHE_PARSER_HELPER_CONTAINER_OBJECT = new LinkedList<ParserHelperContainerObject>();
-	protected volatile static List<IEncodingExtensionHandler<?>> CACHE_ENCODING_EXTENSION = null;
+	protected volatile static List<IDecodingExtensionHandler<?>> CACHE_ENCODING_EXTENSION = null;
 	protected static URIParser getInstance()
 	{
 		if(instance == null)
@@ -172,7 +171,7 @@ public final class URIParser implements Serializable
 		try
 		{
 			workerObject.uri = uri;
-			workerObject.fullPath = uri.getFullPath();
+			workerObject.fullPath = uri.getURIString();
 			workerObject.maxPosition = workerObject.fullPath.length() -1;
 			
 			parseScheme(workerObject);
@@ -267,7 +266,7 @@ public final class URIParser implements Serializable
 			return ;
 		}
 		
-		List<IEncodingExtensionHandler<?>> registeredEncodingExtensionHandler = getEncodingExtensionHandler(ComponentType.AUTHORITY, workerObject.uri);
+		List<IDecodingExtensionHandler<?>> registeredDecodingExtensionHandler = getDecodingExtensionHandler(ComponentType.AUTHORITY, workerObject.uri);
 				
 		workerObject.clearStringBuilder();
 		workerObject.inIPv6Mode = false;
@@ -295,10 +294,10 @@ public final class URIParser implements Serializable
 		{
 			workerObject.readNextCharactor();
 			
-			for(IEncodingExtensionHandler<?> encodingExtensionHandler : registeredEncodingExtensionHandler)
+			for(IDecodingExtensionHandler<?> decodingExtensionHandler : registeredDecodingExtensionHandler)
 			{
 				workerObject.extensionHandleObject.position = workerObject.currentPosition;
-				workerObject.extensionBegin = encodingExtensionHandler.openerCharactersMatched(workerObject.extensionHandleObject);
+				workerObject.extensionBegin = decodingExtensionHandler.openerCharactersMatched(workerObject.extensionHandleObject);
 				if(workerObject.extensionBegin > -1)
 				{
 					if(workerObject.authoritySubComponent == null)
@@ -315,7 +314,7 @@ public final class URIParser implements Serializable
 					
 					workerObject.extensionHandleObject.extension = null;
 					workerObject.extensionHandleObject.position = workerObject.extensionBegin;
-					workerObject.extensionEnd = encodingExtensionHandler.parseRawExtensionString(workerObject.extensionHandleObject);
+					workerObject.extensionEnd = decodingExtensionHandler.parseRawExtensionString(workerObject.extensionHandleObject);
 					workerObject.currentPosition = workerObject.extensionEnd;
 					
 					workerObject.containsExtension = true;
@@ -524,7 +523,7 @@ public final class URIParser implements Serializable
 			return ;
 		}
 		
-		List<IEncodingExtensionHandler<?>> registeredEncodingExtensionHandler = getEncodingExtensionHandler(ComponentType.PATH, workerObject.uri);
+		List<IDecodingExtensionHandler<?>> registeredDecodingExtensionHandler = getDecodingExtensionHandler(ComponentType.PATH, workerObject.uri);
 				
 		workerObject.clearStringBuilder();
 		workerObject.containsQuery = false;
@@ -549,10 +548,10 @@ public final class URIParser implements Serializable
 		{
 			workerObject.readNextCharactor();
 			
-			for(IEncodingExtensionHandler<?> encodingExtensionHandler : registeredEncodingExtensionHandler)
+			for(IDecodingExtensionHandler<?> decodingExtensionHandler : registeredDecodingExtensionHandler)
 			{
 				workerObject.extensionHandleObject.position = workerObject.currentPosition;
-				workerObject.extensionBegin = encodingExtensionHandler.openerCharactersMatched(workerObject.extensionHandleObject);
+				workerObject.extensionBegin = decodingExtensionHandler.openerCharactersMatched(workerObject.extensionHandleObject);
 				if(workerObject.extensionBegin > -1)
 				{
 					if(workerObject.pathSegment == null)
@@ -568,7 +567,7 @@ public final class URIParser implements Serializable
 					
 					workerObject.extensionHandleObject.extension = null;
 					workerObject.extensionHandleObject.position = workerObject.extensionBegin;
-					workerObject.extensionEnd = encodingExtensionHandler.parseRawExtensionString(workerObject.extensionHandleObject);
+					workerObject.extensionEnd = decodingExtensionHandler.parseRawExtensionString(workerObject.extensionHandleObject);
 					workerObject.currentPosition = workerObject.extensionEnd;
 					
 					workerObject.containsExtension = true;
@@ -672,7 +671,7 @@ public final class URIParser implements Serializable
 		workerObject.uri.query = new QueryComponent();
 		workerObject.uri.query.setExpression("");
 		
-		List<IEncodingExtensionHandler<?>> registeredEncodingExtensionHandler = getEncodingExtensionHandler(ComponentType.QUERY, workerObject.uri);
+		List<IDecodingExtensionHandler<?>> registeredDecodingExtensionHandler = getDecodingExtensionHandler(ComponentType.QUERY, workerObject.uri);
 				
 		workerObject.clearStringBuilder();
 		workerObject.containsFragment = false;
@@ -696,10 +695,10 @@ public final class URIParser implements Serializable
 		{
 			workerObject.readNextCharactor();
 			
-			for(IEncodingExtensionHandler<?> encodingExtensionHandler : registeredEncodingExtensionHandler)
+			for(IDecodingExtensionHandler<?> decodingExtensionHandler : registeredDecodingExtensionHandler)
 			{
 				workerObject.extensionHandleObject.position = workerObject.currentPosition;
-				workerObject.extensionBegin = encodingExtensionHandler.openerCharactersMatched(workerObject.extensionHandleObject);
+				workerObject.extensionBegin = decodingExtensionHandler.openerCharactersMatched(workerObject.extensionHandleObject);
 				if(workerObject.extensionBegin > -1)
 				{
 					if(workerObject.querySegment  == null)
@@ -715,7 +714,7 @@ public final class URIParser implements Serializable
 					
 					workerObject.extensionHandleObject.extension = null;
 					workerObject.extensionHandleObject.position = workerObject.extensionBegin;
-					workerObject.extensionEnd = encodingExtensionHandler.parseRawExtensionString(workerObject.extensionHandleObject);
+					workerObject.extensionEnd = decodingExtensionHandler.parseRawExtensionString(workerObject.extensionHandleObject);
 					workerObject.currentPosition = workerObject.extensionEnd;
 					
 					workerObject.containsExtension = true;
@@ -870,7 +869,7 @@ public final class URIParser implements Serializable
 	
 	private static void parseFragment(ParserHelperContainerObject workerObject )
 	{		
-		List<IEncodingExtensionHandler<?>> registeredEncodingExtensionHandler = getEncodingExtensionHandler(ComponentType.FRAGMENT, workerObject.uri);
+		List<IDecodingExtensionHandler<?>> registeredDecodingExtensionHandler = getDecodingExtensionHandler(ComponentType.FRAGMENT, workerObject.uri);
 				
 		workerObject.clearStringBuilder();
 		workerObject.containsExtension = false;
@@ -892,10 +891,10 @@ public final class URIParser implements Serializable
 		{
 			workerObject.readNextCharactor();
 			
-			for(IEncodingExtensionHandler<?> encodingExtensionHandler : registeredEncodingExtensionHandler)
+			for(IDecodingExtensionHandler<?> decodingExtensionHandler : registeredDecodingExtensionHandler)
 			{
 				workerObject.extensionHandleObject.position = workerObject.currentPosition;
-				workerObject.extensionBegin = encodingExtensionHandler.openerCharactersMatched(workerObject.extensionHandleObject);
+				workerObject.extensionBegin = decodingExtensionHandler.openerCharactersMatched(workerObject.extensionHandleObject);
 				if(workerObject.extensionBegin > -1)
 				{
 					if(workerObject.uri.fragment == null)
@@ -908,14 +907,14 @@ public final class URIParser implements Serializable
 					workerObject.clearStringBuilder();
 					workerObject.extensionHandleObject.extension = null;
 					workerObject.extensionHandleObject.position = workerObject.extensionBegin;
-					workerObject.extensionEnd = encodingExtensionHandler.parseRawExtensionString(workerObject.extensionHandleObject);
+					workerObject.extensionEnd = decodingExtensionHandler.parseRawExtensionString(workerObject.extensionHandleObject);
 					workerObject.currentPosition = workerObject.extensionEnd;
 					
 					workerObject.containsExtension = true;
 					
 					if(workerObject.extensionHandleObject.extension != null)
 					{
-						workerObject.querySegment.addExtension(workerObject.extensionHandleObject.extension);
+						workerObject.uri.fragment.addExtension(workerObject.extensionHandleObject.extension);
 					}
 					
 					if(workerObject.currentPosition > workerObject.maxPosition )

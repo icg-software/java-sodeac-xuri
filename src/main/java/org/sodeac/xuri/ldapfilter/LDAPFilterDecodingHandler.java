@@ -13,9 +13,19 @@ package org.sodeac.xuri.ldapfilter;
 import java.io.Serializable;
 import java.util.LinkedList;
 
+import org.sodeac.xuri.ComponentType;
+import org.sodeac.xuri.ExtensionHandleObject;
 import org.sodeac.xuri.FormatException;
 import org.sodeac.xuri.IDecodingExtensionHandler;
 
+/**
+ * XURI decoding extension handler to decode ldap filter items of type {@link IFilterItem}
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ *
+ */
 public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFilterItem>, Serializable
 {
 	/**
@@ -25,6 +35,13 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 	
 	private transient static volatile LDAPFilterDecodingHandler INSTANCE = null;
 	
+	public static final char OPENER = IFilterItem.OPENER;
+	public static final char CLOSER = IFilterItem.CLOSER;
+	public static final char ESCAPE = IFilterItem.ESCAPE;
+	public static final char[] OPENER_CHARACTERS = new char[] {OPENER};
+	public static final char[] CLOSER_CHARACTERS = new char[] {CLOSER};
+	
+	
 	public static LDAPFilterDecodingHandler getInstance()
 	{
 		if(INSTANCE == null)
@@ -32,6 +49,76 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 			INSTANCE = new LDAPFilterDecodingHandler();
 		}
 		return INSTANCE;
+	}
+	
+	@Override
+	public String getType()
+	{
+		return LDAPFilterExtension.TYPE;
+	}
+	
+	@Override
+	public ComponentType[] getApplicableComponents()
+	{
+		return new ComponentType[] {ComponentType.AUTHORITY,ComponentType.PATH,ComponentType.QUERY,ComponentType.FRAGMENT};
+	}
+
+	@Override
+	public int parseRawExtensionString(ExtensionHandleObject extensionHandleObject)
+	{
+		char c;
+		int openerCount = 0;
+		boolean inEscape = false;
+		
+		for(; extensionHandleObject.position < extensionHandleObject.fullPath.length(); extensionHandleObject.position++)
+		{
+			c = extensionHandleObject.fullPath.charAt(extensionHandleObject.position);
+			
+			if(inEscape)
+			{
+				inEscape = false;
+				extensionHandleObject.rawResult.append(c);
+				continue;
+			}
+			
+			if(c == ESCAPE)
+			{
+				inEscape = true;
+				extensionHandleObject.rawResult.append(c);
+				continue;
+			}
+			
+			if(c == OPENER)
+			{
+				openerCount++;
+			}
+			
+			if((c == CLOSER) && (openerCount == 0))
+			{
+				String expression = extensionHandleObject.rawResult.toString();
+				if(expression.startsWith("(") && expression.endsWith(")"))
+				{
+					extensionHandleObject.extension = new LDAPFilterExtension(expression);
+				}
+				else
+				{
+					extensionHandleObject.extension = new LDAPFilterExtension("(" + expression + ")");
+				}
+				return extensionHandleObject.position + 1;
+			}
+			
+			extensionHandleObject.rawResult.append(c);
+		}
+		
+		throw new FormatException("no closing sequence \"" + new String(getCloserCharacters(extensionHandleObject.component)) + "\" found in " + getType() + " : " + extensionHandleObject.rawResult.toString());
+	}
+	
+	
+
+	@Override
+	public int openerCharactersMatched(ExtensionHandleObject extensionHandleObject)
+	{
+		return extensionHandleObject.fullPath.charAt(extensionHandleObject.position) == OPENER ?  extensionHandleObject.position + 1 : -1;
 	}
 	
 	@Override
@@ -45,7 +132,7 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 		
 		StringBuilder sb = new StringBuilder();
 		boolean openMode = true;
-		boolean inLinkerMode = false;
+		//boolean inLinkerMode = false;
 		boolean inAttributeMode = false;
 		
 		boolean invert = false;
@@ -117,7 +204,7 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 					openMode = false;
 					inAttributeNameMode = false;
 					inAttributeValueMode = false;
-					inLinkerMode = currentFilter instanceof AttributeLinker;
+					// inLinkerMode = currentFilter instanceof AttributeLinker;
 					inAttributeMode = false;
 					
 					break;
@@ -303,7 +390,7 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 					unclosedChildOpener = 0;
 					
 					// (re)set modes
-					inLinkerMode = true;
+					// inLinkerMode = true;
 					inAttributeMode = false;
 					inAttributeNameMode = false;
 					inAttributeValueMode = false;
@@ -337,7 +424,7 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 					unclosedChildOpener = 0;
 					
 					// (re)set modes
-					inLinkerMode = true;
+					// inLinkerMode = true;
 					inAttributeMode = false;
 					inAttributeNameMode = false;
 					inAttributeValueMode = false;
@@ -373,7 +460,7 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 						}
 						
 						// (re)set modes
-						inLinkerMode = false;
+						// inLinkerMode = false;
 						inAttributeMode = true;
 						inAttributeNameMode = true;
 						inAttributeValueMode = false;
@@ -406,4 +493,25 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 		return rootFilter;
 	}
 	
+	/**
+	 * getter for opener characters
+	 * 
+	 * @param component applicable component
+	 * @return opener characters
+	 */
+	public char[] getOpenerCharacters(ComponentType component)
+	{
+		return OPENER_CHARACTERS;
+	}
+
+	/**
+	 * setter for closer characters
+	 * 
+	 * @param component applicable component
+	 * @return closer characters
+	 */
+	public char[] getCloserCharacters(ComponentType component)
+	{
+		return CLOSER_CHARACTERS;
+	}
 }

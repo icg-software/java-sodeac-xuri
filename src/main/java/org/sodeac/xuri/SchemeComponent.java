@@ -11,7 +11,16 @@
 package org.sodeac.xuri;
 
 /*
- * https://tools.ietf.org/html/rfc3986#section-3.1
+ * @see {@link https://tools.ietf.org/html/rfc3986#section-3.1}
+ */
+
+/**
+ * Scheme component of URI.
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ * 
  */
 public class SchemeComponent extends AbstractComponent<NoSubComponent>
 {
@@ -22,15 +31,24 @@ public class SchemeComponent extends AbstractComponent<NoSubComponent>
 	
 	private String value = null;
 	
+	/**
+	 * constructor for scheme component
+	 * 
+	 * @param value representative scheme string
+	 */
 	public SchemeComponent(String value)
 	{
 		super(ComponentType.SCHEME);
 		this.value = value;
 	}
 
+	/**
+	 * getter for representative scheme string
+	 * 
+	 * @return representative scheme string
+	 */
 	public String getValue()
 	{
 		return this.value;
 	}
-	
 }

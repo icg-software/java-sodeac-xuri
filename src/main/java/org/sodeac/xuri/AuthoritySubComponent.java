@@ -17,6 +17,14 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Subcomponent of URI authority (user, password, host, port ....)
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ *
+ */
 public class AuthoritySubComponent implements IExtensible, Serializable
 {
 	/**
@@ -24,8 +32,8 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 	 */
 	private static final long serialVersionUID = -8307822793728177004L;
 	
-	private List<IExtension> extensions = null;
-	private volatile List<IExtension> extensionsImmutable = null;
+	private List<IExtension<?>> extensions = null;
+	private volatile List<IExtension<?>> extensionsImmutable = null;
 	private Lock extensionsLock = null;
 	private String expression = null;
 	private String value = null;
@@ -35,45 +43,75 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 	protected AuthoritySubComponent(String expression, String value)
 	{
 		super();
-		extensions = new ArrayList<IExtension>();
+		extensions = new ArrayList<IExtension<?>>();
 		this.extensionsLock = new ReentrantLock();
 		this.expression = expression;
 		this.value = value;
 	}
 	
+	/**
+	 * setter for expression
+	 * 
+	 * @param expression
+	 */
 	protected void setExpression(String expression)
 	{
 		this.expression = expression;
 	}
 	
+	/**
+	 * setter for prefix delimiter
+	 * 
+	 * @param delimiter
+	 */
 	protected void setPrefixDelimiter(char delimiter)
 	{
 		this.prefixDelimiter = delimiter;
 	}
 	
+	/**
+	 * getter prefix delimiter
+	 * 
+	 * @return prefix delimiter
+	 */
 	public char getPrefixDelimiter()
 	{
 		return prefixDelimiter;
 	}
 	
+	/**
+	 * setter for postfix delimiter
+	 * 
+	 * @param postfixDelimiter
+	 */
 	protected void setPostfixDelimiter(char postfixDelimiter)
 	{
 		this.postfixDelimiter = postfixDelimiter;
 	}
 
+	/**
+	 * getter for postfix delimiter
+	 * 
+	 * @return postfix delimiter
+	 */
 	public char getPostfixDelimiter()
 	{
 		return postfixDelimiter;
 	}
 
-	protected void addExtension(IExtension extension)
+	/**
+	 * Append an extension for this authority subcomponent
+	 * 
+	 * @param extension
+	 */
+	protected void addExtension(IExtension<?> extension)
 	{
 		this.extensionsLock.lock();
 		try
 		{
 			if(this.extensions == null)
 			{
-				this.extensions = new ArrayList<IExtension>();
+				this.extensions = new ArrayList<IExtension<?>>();
 			}
 			
 			this.extensions.add(extension);
@@ -86,15 +124,15 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 	}
 
 	@Override
-	public IExtension getExtension(String type)
+	public IExtension<?> getExtension(String type)
 	{
-		List<IExtension> extensionList = getExtensionList();
+		List<IExtension<?>> extensionList = getExtensionList();
 		
 		if((type == null) && (! extensionList.isEmpty()))
 		{
 			return extensionList.get(0);
 		}
-		for(IExtension extension : extensionList)
+		for(IExtension<?> extension : extensionList)
 		{
 			if(type.equals(extension.getType()))
 			{
@@ -105,9 +143,9 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 	}
 
 	@Override
-	public List<IExtension> getExtensionList()
+	public List<IExtension<?>> getExtensionList()
 	{
-		List<IExtension> extensionList = extensionsImmutable;
+		List<IExtension<?>> extensionList = extensionsImmutable;
 		if(extensionList == null)
 		{
 			this.extensionsLock.lock();
@@ -118,7 +156,7 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 				{
 					return extensionList;
 				}
-				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension>() : new ArrayList<IExtension>(this.extensions));
+				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension<?>>() : new ArrayList<IExtension<?>>(this.extensions));
 				extensionList = this.extensionsImmutable;
 			}
 			finally 
@@ -130,10 +168,10 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 	}
 
 	@Override
-	public List<IExtension> getExtensionList(String type)
+	public List<IExtension<?>> getExtensionList(String type)
 	{
-		List<IExtension> extensionList = new ArrayList<IExtension>();
-		for(IExtension extension : getExtensionList())
+		List<IExtension<?>> extensionList = new ArrayList<IExtension<?>>();
+		for(IExtension<?> extension : getExtensionList())
 		{
 			if(type.equals(extension.getType()))
 			{
@@ -143,11 +181,21 @@ public class AuthoritySubComponent implements IExtensible, Serializable
 		return extensionList;
 	}
 
+	/**
+	 * getter for representative string for authority subcomponent (value and extensions)
+	 * 
+	 * @return representative string for authority subcomponent
+	 */
 	public String getExpression()
 	{
 		return expression;
 	}
 
+	/**
+	 * getter for authority subcomponent value
+	 * 
+	 * @return value of authority subcomponent
+	 */
 	public String getValue()
 	{
 		return value;

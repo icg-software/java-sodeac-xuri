@@ -19,6 +19,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
+ * Key-Value segment of URI query. Format of query segment: {@code type:name=format:value}. Name is required.
+ * 
+ * <p>values with format {@code string} must begin and end with single quote. single quotes in payload require a backslash as escapesequence .
+ * <p>values with format {@code must} must begin with { and end with } .
  * 
  * @author Sebastian Palarus
  * @since 1.0
@@ -32,6 +36,15 @@ public class QuerySegment implements Serializable, IExtensible
 	 */
 	private static final long serialVersionUID = 4999925096175079827L;
 
+	/**
+	 * constructor for query segment
+	 * 
+	 * @param expression representative string value query segment
+	 * @param type the type of segment (not required)
+	 * @param name the name of segment
+	 * @param format the format of segment (not required / null, json or string)
+	 * @param value  the value of segment
+	 */
 	public QuerySegment(String expression,String type, String name, String format, String value)
 	{
 		super();
@@ -44,8 +57,8 @@ public class QuerySegment implements Serializable, IExtensible
 		this.extensionsLock = new ReentrantLock();
 	}
 	
-	private List<IExtension> extensions = null;
-	private volatile List<IExtension> extensionsImmutable = null;
+	private List<IExtension<?>> extensions = null;
+	private volatile List<IExtension<?>> extensionsImmutable = null;
 	
 	private Lock extensionsLock = null;
 	private String expression = null;
@@ -54,19 +67,29 @@ public class QuerySegment implements Serializable, IExtensible
 	private String format = null;
 	private String value = null;
 	
+	/**
+	 * setter for expression string
+	 * 
+	 * @param expression
+	 */
 	protected void setExpression(String expression)
 	{
 		this.expression = expression;
 	}
 
-	protected void addExtension(IExtension extension)
+	/**
+	 * Append an extension for this query segment
+	 * 
+	 * @param extension
+	 */
+	protected void addExtension(IExtension<?> extension)
 	{
 		this.extensionsLock.lock();
 		try
 		{
 			if(this.extensions == null)
 			{
-				this.extensions = new ArrayList<IExtension>();
+				this.extensions = new ArrayList<IExtension<?>>();
 			}
 			this.extensions.add(extension);
 			this.extensionsImmutable = null;
@@ -78,15 +101,15 @@ public class QuerySegment implements Serializable, IExtensible
 	}
 
 	@Override
-	public IExtension getExtension(String type)
+	public IExtension<?> getExtension(String type)
 	{
-		List<IExtension> extensionList = getExtensionList();
+		List<IExtension<?>> extensionList = getExtensionList();
 		
 		if((type == null) && (! extensionList.isEmpty()))
 		{
 			return extensionList.get(0);
 		}
-		for(IExtension extension : extensionList)
+		for(IExtension<?> extension : extensionList)
 		{
 			if(type.equals(extension.getType()))
 			{
@@ -97,9 +120,9 @@ public class QuerySegment implements Serializable, IExtensible
 	}
 
 	@Override
-	public List<IExtension> getExtensionList()
+	public List<IExtension<?>> getExtensionList()
 	{
-		List<IExtension> extensionList = extensionsImmutable;
+		List<IExtension<?>> extensionList = extensionsImmutable;
 		if(extensionList == null)
 		{
 			this.extensionsLock.lock();
@@ -110,7 +133,7 @@ public class QuerySegment implements Serializable, IExtensible
 				{
 					return extensionList;
 				}
-				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension>() : new ArrayList<IExtension>(this.extensions));
+				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension<?>>() : new ArrayList<IExtension<?>>(this.extensions));
 				extensionList = this.extensionsImmutable;
 			}
 			finally 
@@ -122,10 +145,10 @@ public class QuerySegment implements Serializable, IExtensible
 	}
 
 	@Override
-	public List<IExtension> getExtensionList(String type)
+	public List<IExtension<?>> getExtensionList(String type)
 	{
-		List<IExtension> extensionList = new ArrayList<IExtension>();
-		for(IExtension extension : getExtensionList())
+		List<IExtension<?>> extensionList = new ArrayList<IExtension<?>>();
+		for(IExtension<?> extension : getExtensionList())
 		{
 			if(type.equals(extension.getType()))
 			{
@@ -135,26 +158,51 @@ public class QuerySegment implements Serializable, IExtensible
 		return extensionList;
 	}
 
+	/**
+	 * getter for representative string for query segment (type,name,format,value and extensions)
+	 * 
+	 * @return representative string for query segment
+	 */
 	public String getExpression()
 	{
 		return expression;
 	}
 
+	/**
+	 * getter for type
+	 * 
+	 * @return
+	 */
 	public String getType()
 	{
 		return type;
 	}
 
+	/**
+	 * getter for name
+	 * 
+	 * @return
+	 */
 	public String getName()
 	{
 		return name;
 	}
 
+	/**
+	 * getter for format
+	 * 
+	 * @return
+	 */
 	public String getFormat()
 	{
 		return format;
 	}
 
+	/**
+	 * getter for value
+	 * 
+	 * @return
+	 */
 	public String getValue()
 	{
 		return value;

@@ -12,6 +12,14 @@ package org.sodeac.xuri;
 
 import java.io.Serializable;
 
+/**
+ * dummy sub component for URI components that are not subdivided into subcomponents
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ *
+ */
 public class NoSubComponent implements Serializable
 {
 

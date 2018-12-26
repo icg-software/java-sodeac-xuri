@@ -19,6 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
+ * Single path segment of URI path.
  * 
  * @author Sebastian Palarus
  * @since 1.0
@@ -32,6 +33,12 @@ public class PathSegment implements Serializable, IExtensible
 	 */
 	private static final long serialVersionUID = -603368963433292990L;
 
+	/**
+	 * constructor of path segment
+	 * 
+	 * @param expression string expression
+	 * @param value segment value
+	 */
 	public PathSegment(String expression, String value)
 	{
 		super();
@@ -42,6 +49,14 @@ public class PathSegment implements Serializable, IExtensible
 		this.extensionsLock = new ReentrantLock();
 	}
 	
+	/**
+	 * 
+	 * constructor of path segment
+	 * 
+	 * @param expression string expression
+	 * @param value segment value
+	 * @param axis axistype
+	 */
 	public PathSegment(String expression, String value, Axis axis)
 	{
 		super();
@@ -50,32 +65,47 @@ public class PathSegment implements Serializable, IExtensible
 		this.axis = axis;
 	}
 
-	private List<IExtension> extensions = null;
-	private volatile List<IExtension> extensionsImmutable = null;
+	private List<IExtension<?>> extensions = null;
+	private volatile List<IExtension<?>> extensionsImmutable = null;
 	
 	private Lock extensionsLock = null;
 	private String expression = null;
 	private String value = null;
 	private Axis axis = null;
 	
+	/**
+	 * setter for expression string
+	 * 
+	 * @param expression
+	 */
 	protected void setExpression(String expression)
 	{
 		this.expression = expression;
 	}
 
+	/**
+	 * getter for axistype
+	 * 
+	 * @return axistype
+	 */
 	public Axis getAxis() 
 	{
 		return axis;
 	}
 
-	protected void addExtension(IExtension extension)
+	/**
+	 * Append an extension for this pathsegment
+	 * 
+	 * @param extension
+	 */
+	protected void addExtension(IExtension<?> extension)
 	{
 		this.extensionsLock.lock();
 		try
 		{
 			if(this.extensions == null)
 			{
-				this.extensions = new ArrayList<IExtension>();
+				this.extensions = new ArrayList<IExtension<?>>();
 			}
 			this.extensions.add(extension);
 			this.extensionsImmutable = null;
@@ -87,15 +117,15 @@ public class PathSegment implements Serializable, IExtensible
 	}
 
 	@Override
-	public IExtension getExtension(String type)
+	public IExtension<?> getExtension(String type)
 	{
-		List<IExtension> extensionList = getExtensionList();
+		List<IExtension<?>> extensionList = getExtensionList();
 		
 		if((type == null) && (! extensionList.isEmpty()))
 		{
 			return extensionList.get(0);
 		}
-		for(IExtension extension : extensionList)
+		for(IExtension<?> extension : extensionList)
 		{
 			if(type.equals(extension.getType()))
 			{
@@ -106,9 +136,9 @@ public class PathSegment implements Serializable, IExtensible
 	}
 
 	@Override
-	public List<IExtension> getExtensionList()
+	public List<IExtension<?>> getExtensionList()
 	{
-		List<IExtension> extensionList = extensionsImmutable;
+		List<IExtension<?>> extensionList = extensionsImmutable;
 		if(extensionList == null)
 		{
 			this.extensionsLock.lock();
@@ -119,7 +149,7 @@ public class PathSegment implements Serializable, IExtensible
 				{
 					return extensionList;
 				}
-				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension>() : new ArrayList<IExtension>(this.extensions));
+				this.extensionsImmutable = Collections.unmodifiableList(this.extensions == null ? new ArrayList<IExtension<?>>() : new ArrayList<IExtension<?>>(this.extensions));
 				extensionList = this.extensionsImmutable;
 			}
 			finally 
@@ -131,10 +161,10 @@ public class PathSegment implements Serializable, IExtensible
 	}
 
 	@Override
-	public List<IExtension> getExtensionList(String type)
+	public List<IExtension<?>> getExtensionList(String type)
 	{
-		List<IExtension> extensionList = new ArrayList<IExtension>();
-		for(IExtension extension : getExtensionList())
+		List<IExtension<?>> extensionList = new ArrayList<IExtension<?>>();
+		for(IExtension<?> extension : getExtensionList())
 		{
 			if(type.equals(extension.getType()))
 			{
@@ -144,11 +174,21 @@ public class PathSegment implements Serializable, IExtensible
 		return extensionList;
 	}
 
+	/**
+	 * getter for representative string for pathsegment (value and extensions)
+	 * 
+	 * @return representative string for pathsegment
+	 */
 	public String getExpression()
 	{
 		return expression;
 	}
 
+	/**
+	 * getter for pathsegment value
+	 * 
+	 * @return value of pathsegment
+	 */
 	public String getValue()
 	{
 		return value;

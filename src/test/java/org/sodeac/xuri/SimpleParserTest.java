@@ -439,6 +439,7 @@ public class SimpleParserTest
 		// parse String / JSON
 		
 		String str = "utf8 = &{( formated \\'text\\' \\t # ";
+		// {"id":13, "name":"Max\tMuster-\nmann", mother:{"id":1, "name":"Diana }" }}
 		String json =  "{\"id\":13, \"name\":\"Max\\tMuster-\\nmann\", mother:{\"id\":1, \"name\":\"Diana }\" }}";
 		String queryString = 
 				"action=check" + "&"

@@ -14,6 +14,14 @@ package org.sodeac.xuri;
  * https://tools.ietf.org/html/rfc3986#section-3.4
  */
 
+/**
+ * Query component of URI. Query components contains multiple subcomponents of type {@link QuerySegment}. 
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ *
+ */
 public class QueryComponent extends AbstractComponent<QuerySegment>
 {
 	/**

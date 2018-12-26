@@ -10,7 +10,40 @@
  *******************************************************************************/
 package org.sodeac.xuri;
 
-public interface IExtension
+/**
+ * 
+ * Interface for extensions to define and handle an expression string
+ * 
+ * @author Sebastian Palarus
+ *
+ */
+public interface IExtension<T>
 {
+	/**
+	 * 
+	 * @return type of extension
+	 */
 	public String getType();
+	
+	/**
+	 * 
+	 * @return representative expression string for extension
+	 */
+	public String getExpression();
+	
+	/**
+	 * decode expression string to extension data object
+	 * 
+	 * @param expression expression string
+	 * @return extension data object
+	 */
+	public T decodeFromString(String expression);
+	
+	/**
+	 * encode extension data object to expression string
+	 * 
+	 * @param extensionDataObject extension data object
+	 * @return expression string
+	 */
+	public String encodeToString(T extensionDataObject);
 }

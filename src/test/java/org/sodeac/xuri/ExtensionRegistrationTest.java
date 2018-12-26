@@ -16,10 +16,10 @@ public class ExtensionRegistrationTest
 		
 		new URI("http://de.wikipedia.org/wiki/Uniform_Resource_Identifier");
 		
-		int sizeBefore = URIParser.getEncodingExtensionHandler(null, null).size();
-		IEncodingExtensionHandler<String> encodingExtension = new IEncodingExtensionHandler<String>()
+		int sizeBefore = URIParser.getDecodingExtensionHandler(null, null).size();
+		IDecodingExtensionHandler<String> decodingExtension = new IDecodingExtensionHandler()
 		{
-
+			
 			@Override
 			public String getType()
 			{
@@ -43,17 +43,16 @@ public class ExtensionRegistrationTest
 			{
 				return new ComponentType[0];
 			}
-
-			@Override
-			public String encodeToString(String extensionDataObject)
-			{
-				return extensionDataObject;
-			}
 			
+			@Override
+			public String decodeFromString(String raw)
+			{
+				return raw;
+			}
 		};		
-		URIParser.addEncodingExtensionHandler(encodingExtension);
+		URIParser.addDecodingExtensionHandler(decodingExtension);
 		
-		int sizeAfter = URIParser.getEncodingExtensionHandler(null, null).size();
+		int sizeAfter = URIParser.getDecodingExtensionHandler(null, null).size();
 		
 		new URI("http://de.wikipedia.org/wiki/Uniform_Resource_Identifier");
 		

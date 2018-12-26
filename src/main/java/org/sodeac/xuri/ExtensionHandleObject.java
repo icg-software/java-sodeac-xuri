@@ -12,6 +12,12 @@ package org.sodeac.xuri;
 
 import java.io.Serializable;
 
+/***
+ * worker object only
+ * 
+ * @author Sebastian Palarus
+ *
+ */
 public class ExtensionHandleObject implements Serializable
 {
 	/**

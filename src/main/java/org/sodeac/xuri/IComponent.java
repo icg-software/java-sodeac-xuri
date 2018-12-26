@@ -10,6 +10,16 @@
  *******************************************************************************/
 package org.sodeac.xuri;
 
+/**
+ * 
+ * Component of URI (scheme, authority, path, query, fragment)
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ * 
+ * @param <T>
+ */
 public interface IComponent<T>
 {
 

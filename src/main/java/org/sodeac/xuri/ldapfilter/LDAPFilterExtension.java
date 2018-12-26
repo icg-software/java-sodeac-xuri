@@ -14,7 +14,14 @@ import java.io.Serializable;
 
 import org.sodeac.xuri.IExtension;
 
-public class LDAPFilterExtension implements IExtension, Serializable
+/**
+ * XURI filter extension for ldap filter.
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ */
+public class LDAPFilterExtension implements IExtension<IFilterItem>, Serializable
 {
 	/**
 	 * 
@@ -22,6 +29,20 @@ public class LDAPFilterExtension implements IExtension, Serializable
 	private static final long serialVersionUID = 9054192628876497162L;
 	
 	public static final String TYPE = "org.sodeac.xuri.ldapfilter";
+	
+	public LDAPFilterExtension(String rawString)
+	{
+		super();
+		this.rawString = rawString;
+	}
+	
+	private String rawString = null;
+
+	@Override
+	public String getExpression()
+	{
+		return rawString;
+	}
 
 	@Override
 	public String getType()
@@ -29,4 +50,15 @@ public class LDAPFilterExtension implements IExtension, Serializable
 		return TYPE;
 	}
 
+	@Override
+	public IFilterItem decodeFromString(String expression)
+	{
+		return LDAPFilterDecodingHandler.getInstance().decodeFromString(expression);
+	}
+
+	@Override
+	public String encodeToString(IFilterItem extensionDataObject)
+	{
+		return LDAPFilterEncodingHandler.getInstance().encodeToString(extensionDataObject);
+	}
 }

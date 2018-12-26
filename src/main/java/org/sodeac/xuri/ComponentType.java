@@ -19,7 +19,8 @@ import java.util.Set;
  */
 
 /**
- *  
+ * Enum of URI - components types. 
+ * 
  * @author Sebastian Palarus
  * @since 1.0
  * @version 1.0

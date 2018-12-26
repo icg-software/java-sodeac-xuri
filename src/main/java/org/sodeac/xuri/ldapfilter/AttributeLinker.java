@@ -19,6 +19,14 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Attribute linker represents an ldap query and consists of multiple ldap attributes or other attribute linker.
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ *
+ */
 public class AttributeLinker implements IFilterItem, Serializable 
 {	
 	/**
@@ -26,6 +34,9 @@ public class AttributeLinker implements IFilterItem, Serializable
 	 */
 	private static final long serialVersionUID = 3252972156160851293L;
 
+	/**
+	 * constructor of attribute linker
+	 */
 	public AttributeLinker()
 	{
 		super();
@@ -40,6 +51,11 @@ public class AttributeLinker implements IFilterItem, Serializable
 	private List<IFilterItem> linkedItemList = new ArrayList<IFilterItem>();
 	private List<IFilterItem> linkedItemListCopy = null;
 
+	/**
+	 * getter for linked filter item list
+	 * 
+	 * @return linked filter item list
+	 */
 	public List<IFilterItem> getLinkedItemList() 
 	{
 		List<IFilterItem> itemList = this.linkedItemListCopy ;
@@ -65,7 +81,13 @@ public class AttributeLinker implements IFilterItem, Serializable
 		}
 	}
 	
-	public IFilterItem addItem(IFilterItem item)
+	/**
+	 * adds new filter item to list
+	 * 
+	 * @param item filter item to add
+	 * @return attribute linker
+	 */
+	public AttributeLinker addItem(IFilterItem item)
 	{
 		if(item instanceof Attribute)
 		{
@@ -86,7 +108,7 @@ public class AttributeLinker implements IFilterItem, Serializable
 			lock.unlock();
 		}
 		
-		return item;
+		return this;
 	}
 
 	@Override
@@ -102,6 +124,11 @@ public class AttributeLinker implements IFilterItem, Serializable
 		return this;
 	}
 	
+	/**
+	 * setter for parent attribute linker
+	 * 
+	 * @param parent parent attribute linker
+	 */
 	protected void setParent(AttributeLinker parent)
 	{
 		this.parent = parent;
@@ -113,11 +140,21 @@ public class AttributeLinker implements IFilterItem, Serializable
 		return this.parent;
 	}
 
+	/** 
+	 * getter for link operator
+	 * @return link operator
+	 */
 	public LogicalOperator getOperator() 
 	{
 		return operator;
 	}
 
+	/**
+	 * setter for link operator
+	 * 
+	 * @param operator link operator
+	 * @return this
+	 */
 	public AttributeLinker setOperator(LogicalOperator operator) 
 	{
 		this.operator = operator;
@@ -155,6 +192,7 @@ public class AttributeLinker implements IFilterItem, Serializable
 		return stringBuilder.toString();
 	}
 	
+	@Override
 	public boolean matches(Map<String,IMatchable> properties)
 	{
 		if(operator == LogicalOperator.OR)

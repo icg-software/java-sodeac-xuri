@@ -14,6 +14,14 @@ package org.sodeac.xuri.ldapfilter;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * Represents an ldap attribute.
+ * 
+ * @author Sebastian Palarus
+ * @since 1.0
+ * @version 1.0
+ *
+ */
 public class Attribute implements IFilterItem, Serializable
 {
 	/**
@@ -21,6 +29,9 @@ public class Attribute implements IFilterItem, Serializable
 	 */
 	private static final long serialVersionUID = -5791677902733009628L;
 
+	/**
+	 * constructor of ldap attribute
+	 */
 	public Attribute()
 	{
 		super();
@@ -32,28 +43,67 @@ public class Attribute implements IFilterItem, Serializable
 	private String value = null;
 	private AttributeLinker parent;
 	
+	/**
+	 * getter for name of ldap attribute
+	 * 
+	 * @return name of ldap attribute
+	 */
 	public String getName() 
 	{
 		return name;
 	}
+	
+	/**
+	 * setter for name of ldap attribute
+	 * 
+	 * @param name ldap attribute name
+	 * 
+	 * @return attribute
+	 */
 	public Attribute setName(String name) 
 	{
 		this.name = name;
 		return this;
 	}
+	
+	/**
+	 * getter for ldap operator
+	 * 
+	 * @return operator
+	 */
 	public ComparativeOperator getOperator() 
 	{
 		return operator;
 	}
+	
+	/**
+	 * setter for ldap operator
+	 * 
+	 * @param operator ldap attribute operator
+	 * @return
+	 */
 	public Attribute setOperator(ComparativeOperator operator) 
 	{
 		this.operator = operator;
 		return this;
 	}
+	
+	/**
+	 * getter for value of ldap attribute
+	 * 
+	 * @return value of ldap attribute
+	 */
 	public String getValue() 
 	{
 		return value;
 	}
+	
+	/**
+	 * setter for value of ldap attribute
+	 * 
+	 * @param value ldap attribute value
+	 * @return attribute
+	 */
 	public Attribute setValue(String value) 
 	{
 		this.value = value;
@@ -79,6 +129,11 @@ public class Attribute implements IFilterItem, Serializable
 		return this.parent;
 	}
 	
+	/**
+	 * setter for parent
+	 * 
+	 * @param parent parent attribute linker
+	 */
 	protected void setParent(AttributeLinker parent)
 	{
 		this.parent = parent;
@@ -132,6 +187,7 @@ public class Attribute implements IFilterItem, Serializable
 		return stringBuilder.toString();
 	}
 	
+	@Override
 	public boolean matches(Map<String,IMatchable> properties)
 	{
 		IMatchable matchable = properties.get(this.name);

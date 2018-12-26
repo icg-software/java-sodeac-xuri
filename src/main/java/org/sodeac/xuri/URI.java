@@ -13,6 +13,7 @@ package org.sodeac.xuri;
 import java.io.Serializable;
 
 /**
+ * Represents a Uniform Resource Identifier (URI) reference. 
  * 
  * @author Sebastian Palarus
  * @since 1.0
@@ -27,7 +28,7 @@ public class URI implements Serializable
 	 */
 	private static final long serialVersionUID = 1421043812832070455L;
 
-	protected String fullPath = null;
+	protected String uriString = null;
 	
 	protected SchemeComponent scheme = null;
 	protected AuthorityComponent authority = null;
@@ -35,47 +36,81 @@ public class URI implements Serializable
 	protected QueryComponent query = null;
 	protected FragmentComponent fragment = null;
 	
-	public URI(String fullPath)
+	/**
+	 * Constructor of URI. 
+	 * 
+	 * @param uriString complete URI string
+	 */
+	public URI(String uriString)
 	{
 		super();
-		this.fullPath = fullPath;
+		this.uriString = uriString;
 		URIParser.getInstance().parse(this);
 	}
 
-	public String getFullPath() 
+	/**
+	 * getter for URI string
+	 *  
+	 * @return complete URI string
+	 */
+	public String getURIString() 
 	{
-		return fullPath;
+		return uriString;
 	}
 	
 	@Override
 	public String toString() 
 	{
-		return this.fullPath;
+		return this.uriString;
 	}
 	
+	/**
+	 * getter for scheme
+	 * 
+	 * @return scheme object
+	 */
 	public SchemeComponent getScheme()
 	{
 		return this.scheme;
 	}
 
+	/**
+	 * getter for authority object
+	 * 
+	 * @return authority object
+	 */
 	public AuthorityComponent getAuthority()
 	{
 		return authority;
 	}
 
+	/**
+	 * getter for query object
+	 * 
+	 * @return query object
+	 */
 	public QueryComponent getQuery()
 	{
 		return query;
 	}
 
+	/**
+	 * getter for path object
+	 * 
+	 * @return path object
+	 */
 	public PathComponent getPath()
 	{
 		return path;
 	}
 	
+	/**
+	 * getter for fragment object
+	 * 
+	 * @return fragment object
+	 */
 	public FragmentComponent getFragment()
 	{
 		return this.fragment;
 	}
-	
 }
