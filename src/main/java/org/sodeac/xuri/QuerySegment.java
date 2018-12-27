@@ -21,8 +21,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Key-Value segment of URI query. Format of query segment: {@code type:name=format:value}. Name is required.
  * 
- * <p>values with format {@code string} must begin and end with single quote. single quotes in payload require a backslash as escapesequence .
- * <p>values with format {@code must} must begin with { and end with } .
+ * <p>Values with format {@code string} must begin and end with single quote. single quotes in payload require a backslash as escapesequence .
+ * <p>Values with format {@code json} must begin with { and end with } .
  * 
  * @author Sebastian Palarus
  * @since 1.0

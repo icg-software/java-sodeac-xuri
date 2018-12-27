@@ -10,6 +10,7 @@
  *******************************************************************************/
 
 /**
+ * Sodeac xURI provide an extensible URI Parser.
  * 
  * @author Sebastian Palarus
  * @since 1.0

@@ -30,5 +30,5 @@ public class ExtensionHandleObject implements Serializable
 	public String fullPath;
 	public int position;
 	public StringBuilder rawResult;
-	public IExtension extension;
+	public IExtension<?> extension;
 }
