@@ -82,6 +82,7 @@
             <Bundle-Version>${bundle.version}</Bundle-Version>
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
             <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+            <Implementation-Build>${scmBranch}@r${buildNumber}</Implementation-Build>
             <Export-Package>org.sodeac.xuri*;version="${bundle.version}"</Export-Package>
           </instructions>
           <source>${jdk.version}</source>
