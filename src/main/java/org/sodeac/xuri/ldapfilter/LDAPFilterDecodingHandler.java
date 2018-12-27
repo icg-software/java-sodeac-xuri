@@ -93,18 +93,25 @@ public class LDAPFilterDecodingHandler implements IDecodingExtensionHandler<IFil
 				openerCount++;
 			}
 			
-			if((c == CLOSER) && (openerCount == 0))
+			if(c == CLOSER)
 			{
-				String expression = extensionHandleObject.rawResult.toString();
-				if(expression.startsWith("(") && expression.endsWith(")"))
+				if(openerCount == 0)
 				{
-					extensionHandleObject.extension = new LDAPFilterExtension(expression);
+					String expression = extensionHandleObject.rawResult.toString();
+					if(expression.startsWith("(") && expression.endsWith(")"))
+					{
+						extensionHandleObject.extension = new LDAPFilterExtension(expression);
+					}
+					else
+					{
+						extensionHandleObject.extension = new LDAPFilterExtension("(" + expression + ")");
+					}
+					return extensionHandleObject.position + 1;
 				}
 				else
 				{
-					extensionHandleObject.extension = new LDAPFilterExtension("(" + expression + ")");
+					openerCount--;
 				}
-				return extensionHandleObject.position + 1;
 			}
 			
 			extensionHandleObject.rawResult.append(c);
