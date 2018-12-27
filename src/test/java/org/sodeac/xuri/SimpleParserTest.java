@@ -6,6 +6,11 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sodeac.xuri.URI;
+import org.sodeac.xuri.ldapfilter.Attribute;
+import org.sodeac.xuri.ldapfilter.AttributeLinker;
+import org.sodeac.xuri.ldapfilter.ComparativeOperator;
+import org.sodeac.xuri.ldapfilter.IFilterItem;
+import org.sodeac.xuri.ldapfilter.LogicalOperator;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SimpleParserTest 
@@ -204,8 +209,8 @@ public class SimpleParserTest
 		assertEquals("subauthority[x] should contains correct value","bbb", uri.getAuthority().getSubComponentList().get(2).getValue());
 		assertEquals("subauthority[x] should contains correct extension.size",0, uri.getAuthority().getSubComponentList().get(2).getExtensionList().size());
 		
-		uri = new URI("sdc://aaa:bbb:eventdispatcher(id=default)(timeout=1000)/");
-		assertEquals("authority should contains correct expression","aaa:bbb:eventdispatcher(id=default)(timeout=1000)", uri.getAuthority().getExpression());
+		uri = new URI("sdc://aaa:bbb:eventdispatcher(id=default)(&(timeout=1000)(mode=soft))/");
+		assertEquals("authority should contains correct expression","aaa:bbb:eventdispatcher(id=default)(&(timeout=1000)(mode=soft))", uri.getAuthority().getExpression());
 		assertEquals("subauthority.size should be correct",3, uri.getAuthority().getSubComponentList().size());
 		assertEquals("subauthority[x] should contains correct expression","aaa", uri.getAuthority().getSubComponentList().get(0).getExpression());
 		assertEquals("subauthority[x] should contains correct value","aaa", uri.getAuthority().getSubComponentList().get(0).getValue());
@@ -213,9 +218,30 @@ public class SimpleParserTest
 		assertEquals("subauthority[x] should contains correct expression","bbb", uri.getAuthority().getSubComponentList().get(1).getExpression());
 		assertEquals("subauthority[x] should contains correct value","bbb", uri.getAuthority().getSubComponentList().get(1).getValue());
 		assertEquals("subauthority[x] should contains correct extension.size",0, uri.getAuthority().getSubComponentList().get(1).getExtensionList().size());
-		assertEquals("subauthority[x] should contains correct expression","eventdispatcher(id=default)(timeout=1000)", uri.getAuthority().getSubComponentList().get(2).getExpression());
+		assertEquals("subauthority[x] should contains correct expression","eventdispatcher(id=default)(&(timeout=1000)(mode=soft))", uri.getAuthority().getSubComponentList().get(2).getExpression());
 		assertEquals("subauthority[x] should contains correct value","eventdispatcher", uri.getAuthority().getSubComponentList().get(2).getValue());
 		assertEquals("subauthority[x] should contains correct extension.size",2, uri.getAuthority().getSubComponentList().get(2).getExtensionList().size());
+		IExtension<IFilterItem> filter1Extension = (IExtension<IFilterItem>)uri.getAuthority().getSubComponentList().get(2).getExtensionList().get(0);
+		IExtension<IFilterItem> filter2Extension = (IExtension<IFilterItem>)uri.getAuthority().getSubComponentList().get(2).getExtensionList().get(1);
+		
+		Attribute filter1 = (Attribute)filter1Extension.decodeFromString(filter1Extension.getExpression());
+		AttributeLinker filter2 = (AttributeLinker)filter2Extension.decodeFromString(filter2Extension.getExpression());
+		assertEquals("filter1 name should be correct", "id",filter1.getName());
+		assertEquals("filter1 operator should be correct", ComparativeOperator.EQUAL.name(),filter1.getOperator().name());
+		assertEquals("filter1 value should be correct", "default",filter1.getValue());
+		
+		Attribute filter2a = (Attribute)filter2.getLinkedItemList().get(0);
+		Attribute filter2b = (Attribute)filter2.getLinkedItemList().get(1);
+		
+		assertEquals("filter2 logical operator should be correct",LogicalOperator.AND.name(), filter2.getOperator().name());
+		
+		assertEquals("filter2a name should be correct", "timeout",filter2a.getName());
+		assertEquals("filter2a operator should be correct", ComparativeOperator.EQUAL.name(),filter2a.getOperator().name());
+		assertEquals("filter2a value should be correct", "1000",filter2a.getValue());
+		
+		assertEquals("filter2b name should be correct", "mode",filter2b.getName());
+		assertEquals("filter2b operator should be correct", ComparativeOperator.EQUAL.name(),filter2b.getOperator().name());
+		assertEquals("filter2b value should be correct", "soft",filter2b.getValue());
 		
 	}
 	
@@ -446,7 +472,7 @@ public class SimpleParserTest
 				+ "test=string:'" + str + "'" + "&"
 				+ "org.sodeac.user.User:user=json:" + json + "";
 		
-		uri = new URI("sdc://eventdispatcher(id=default)/org.sodeac.user.service?" + queryString);
+		uri = new URI("sdc://eventdispatcher(|(id=default)(id=userservice))/org.sodeac.user.service?" + queryString);
 		assertEquals("query should contains correct expression",queryString, uri.getQuery().getExpression());
 		
 		assertNull("querysegment[x] should contains correct type", uri.getQuery().getSubComponentList().get(0).getType());
