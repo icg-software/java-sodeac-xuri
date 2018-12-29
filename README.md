@@ -10,6 +10,7 @@ xURI enables to use customized deserializer while parsing URI string.
 ## Maven
 
 ```xml
+<!-- requires java 8+ -->
 <dependency>
   <groupId>org.sodeac</groupId>
   <artifactId>org.sodeac.xuri</artifactId>
