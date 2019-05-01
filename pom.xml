@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sodeac</groupId>
   <artifactId>org.sodeac.xuri</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>bundle</packaging>
   <name>Sodeac xURI</name>
   <description>Extensible URI parser</description>
@@ -10,7 +10,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.version>1.8</jdk.version>
-    <bundle.version>1.0.0</bundle.version>
+    <bundle.version>1.0.1</bundle.version>
   </properties>
   
   <dependencies>
@@ -75,7 +75,7 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
-        <version>4.1.0</version>
+        <version>4.2.0</version>
         <configuration>
           <instructions>
           	<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
